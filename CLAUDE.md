@@ -2,14 +2,14 @@
 
 ## Project Overview
 
-search-mcp —  project
+search-mcp — Self-hosted MCP server for AI-optimized web search and content extraction. Powered by SearXNG.
 
 | Directory | Purpose | Tech |
 |-----------|---------|------|
-| `docs/` | Documentation | <!-- fill in --> |
-| `scripts/` | Build and utility scripts | <!-- fill in --> |
-| `src/` | Application source code | <!-- fill in --> |
-| `tests/` | Test files | <!-- fill in --> |
+| `src/` | MCP server source code | Python |
+| `tests/` | Test files | pytest |
+| `docs/` | Documentation | Markdown |
+| `scripts/` | Build and utility scripts | Shell |
 
 ## Session Start
 
@@ -25,6 +25,11 @@ This gives me a quick standup-style briefing without needing to context-switch t
 ## Common Commands
 
 ```bash
+# Run the MCP server locally
+podman compose up
+
+# Run tests
+python3 -m pytest tests/
 
 # Pre-commit hooks (trufflehog secret scanning)
 pre-commit install                    # One-time setup
@@ -34,18 +39,29 @@ pre-commit run trufflehog --all-files # Manual scan
 ## Architecture
 
 ```
-<!-- Add your project's architecture diagram here -->
+Claude Code ──MCP (stdio)──▶ search-mcp-server (Python, Docker)
+                                  │
+                                  ├── search(query) ──▶ SearXNG (Docker) ──▶ Google/Bing/DDG
+                                  │
+                                  └── extract(url) ──▶ trafilatura
 ```
+
+Both services run in Docker Compose (using Podman).
 
 ## Key Patterns
 
-<!-- Document your project's key patterns and conventions here -->
+- MCP server uses the Python `mcp` SDK with stdio transport
+- SearXNG provides the search backend — no third-party API keys needed
+- trafilatura handles web content extraction to clean markdown
+- All services containerized via Podman Compose
 
 ## Coding Rules
 
 - **No hardcoded paths.** Use env vars, config, or relative paths.
 - **UTC timestamps everywhere.** Store and compare times in UTC.
-<!-- Add project-specific coding rules here -->
+- **Use Podman, not Docker.** Use `podman` and `podman compose` instead of `docker` and `docker compose`.
+- **Use `python3` explicitly.** Never use bare `python` or `pip`.
+- **No third-party API keys required.** The entire stack must be self-hostable without external service dependencies.
 
 ## Dev Workflow
 
