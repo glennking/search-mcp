@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: trufflehog
+        name: Detect hardcoded secrets
+        language: system
+        entry: trufflehog git file://. --since-commit HEAD --only-verified --fail
+        pass_filenames: false
